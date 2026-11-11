@@ -11,6 +11,8 @@ import { MockupViewer } from './components/Preview/MockupViewer';
 import { BottomBar } from './components/BottomBar/BottomBar';
 import { ExportModal } from './components/Header/ExportModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 export const App: React.FC = () => {
   const {
@@ -97,6 +99,10 @@ export const App: React.FC = () => {
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
       />
+
+      {/* Vercel Web Analytics & Speed Insights */}
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 };
