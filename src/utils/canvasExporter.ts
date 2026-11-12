@@ -134,10 +134,14 @@ export async function exportToCanvas(
   ctx.putImageData(imgData, 0, 0);
 
   // 3. Render SVG filter overlay for the organic feTurbulence cloudy/fibrous texture
+  const scale = Math.max(0.2, config.grainScale || 1.0);
+  const freqX = (config.baseFrequencyX / scale).toFixed(4);
+  const freqY = (config.baseFrequencyY / scale).toFixed(4);
+
   const svgMarkup = `
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
   <filter id="f">
-    <feTurbulence type="${config.noiseType}" baseFrequency="${config.baseFrequencyX} ${config.baseFrequencyY}" numOctaves="${config.numOctaves}" seed="${config.seed}" stitchTiles="stitch"/>
+    <feTurbulence type="${config.noiseType}" baseFrequency="${freqX} ${freqY}" numOctaves="${config.numOctaves}" seed="${config.seed}" stitchTiles="stitch"/>
     <feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 ${opacity * 0.7} 0"/>
   </filter>
   <rect width="100%" height="100%" filter="url(#f)"/>

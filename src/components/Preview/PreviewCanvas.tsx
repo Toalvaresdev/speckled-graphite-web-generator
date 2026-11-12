@@ -16,11 +16,12 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ config }) => {
   // Dynamic filter ID containing all reactive visual parameters
   // This guarantees browsers (Chrome & Safari WebKit) re-render immediately on slider drag
   const filterId = useMemo(() => {
-    return `live-g-${config.seed}-${config.baseFrequencyX.toFixed(3)}-${config.baseFrequencyY.toFixed(3)}-${config.numOctaves}-${config.blur.toFixed(1)}-${config.speckleDensity}-${config.speckleContrast.toFixed(1)}-${config.speckleSharpness}-${config.speckleTone}-${config.grainOpacity}-${config.noiseType}-${config.surfaceLighting ? 'lit' : 'flat'}`;
+    return `live-g-${config.seed}-${config.baseFrequencyX.toFixed(3)}-${config.baseFrequencyY.toFixed(3)}-${config.grainScale.toFixed(2)}-${config.numOctaves}-${config.blur.toFixed(1)}-${config.speckleDensity}-${config.speckleContrast.toFixed(1)}-${config.speckleSharpness}-${config.speckleTone}-${config.grainOpacity}-${config.noiseType}-${config.surfaceLighting ? 'lit' : 'flat'}`;
   }, [
     config.seed,
     config.baseFrequencyX,
     config.baseFrequencyY,
+    config.grainScale,
     config.numOctaves,
     config.blur,
     config.speckleDensity,
@@ -95,8 +96,6 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ config }) => {
               style={{
                 mixBlendMode: config.blendMode,
                 opacity: config.grainOpacity / 100,
-                transform: config.grainScale !== 1 ? `scale(${config.grainScale})` : undefined,
-                transformOrigin: 'center center',
               }}
             />
           </svg>

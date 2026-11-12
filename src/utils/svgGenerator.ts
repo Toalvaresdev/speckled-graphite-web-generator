@@ -11,6 +11,7 @@ export function generateSvgFilterMarkup(
   const {
     baseFrequencyX,
     baseFrequencyY,
+    grainScale = 1.0,
     numOctaves,
     noiseType,
     stitchTiles,
@@ -27,6 +28,12 @@ export function generateSvgFilterMarkup(
   } = config;
 
   const stitch = stitchTiles ? 'stitch' : 'noStitch';
+
+  // Procedural grain scale: modulates frequency mathematically
+  // Avoids CSS transform clipping and enables grain to scale seamlessly up to 3x without vanishing
+  const scale = Math.max(0.2, grainScale || 1.0);
+  const freqX = (baseFrequencyX / scale).toFixed(4);
+  const freqY = (baseFrequencyY / scale).toFixed(4);
 
   // 1. Threshold calculation for crisp stipples / dots
   const coverage = (speckleDensity / 100) * 0.45 + 0.05;
@@ -66,10 +73,10 @@ export function generateSvgFilterMarkup(
 
   return `
 <filter id="${filterId}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
-  <!-- 1. Organic Base Turbulence -->
+  <!-- 1. Organic Base Turbulence with Scaled Grain -->
   <feTurbulence 
     type="${noiseType}" 
-    baseFrequency="${baseFrequencyX.toFixed(4)} ${baseFrequencyY.toFixed(4)}" 
+    baseFrequency="${freqX} ${freqY}" 
     numOctaves="${numOctaves}" 
     seed="${seed}" 
     stitchTiles="${stitch}" 

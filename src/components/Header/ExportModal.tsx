@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Copy, Check, Download, Image as ImageIcon, Code2 } from 'lucide-react';
+import { track } from '@vercel/analytics';
 import { GraphiteConfig, AspectRatio } from '../../types/graphite';
 import { generateCssSnippet, generateTailwindSnippet, generateReactJsxSnippet } from '../../utils/cssGenerator';
 import { generateFullSvg } from '../../utils/svgGenerator';
@@ -57,6 +58,24 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
           ? 'image/jpeg'
           : 'image/png';
 
+      // Track event with Vercel Analytics
+      try {
+        track('download_image', {
+          format: imgFormat,
+          resolution: `${finalWidth}x${finalHeight}`,
+          ratio: selectedRatio,
+          quality: quality,
+          tone: config.speckleTone,
+          seed: config.seed,
+        });
+
+        // Also increment local count for in-app tracking
+        const currentCount = parseInt(localStorage.getItem('speckled_downloads_count') || '0', 10);
+        localStorage.setItem('speckled_downloads_count', String(currentCount + 1));
+      } catch (err) {
+        // Analytics non-blocking
+      }
+
       await exportToCanvas(
         config,
         finalWidth,
@@ -75,9 +94,33 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+
+    // Track code copy with Vercel Analytics
+    try {
+      track('copy_code', {
+        type: codeType,
+        tone: config.speckleTone,
+      });
+      const currentCopies = parseInt(localStorage.getItem('speckled_copies_count') || '0', 10);
+      localStorage.setItem('speckled_copies_count', String(currentCopies + 1));
+    } catch (err) {
+      // Non-blocking
+    }
   };
 
   const handleDownloadSvg = () => {
+    // Track SVG download
+    try {
+      track('download_svg', {
+        resolution: `${finalWidth}x${finalHeight}`,
+        tone: config.speckleTone,
+      });
+      const currentCount = parseInt(localStorage.getItem('speckled_downloads_count') || '0', 10);
+      localStorage.setItem('speckled_downloads_count', String(currentCount + 1));
+    } catch (err) {
+      // Non-blocking
+    }
+
     const svgContent = generateFullSvg(config, finalWidth, finalHeight);
     const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);

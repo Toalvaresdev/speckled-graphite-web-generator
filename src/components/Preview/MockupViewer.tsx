@@ -13,11 +13,12 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
   const backgroundCss = generateCssBackground(config);
   
   const filterId = useMemo(() => {
-    return `mockup-g-${config.seed}-${config.baseFrequencyX.toFixed(3)}-${config.baseFrequencyY.toFixed(3)}-${config.numOctaves}-${config.blur.toFixed(1)}-${config.speckleDensity}-${config.speckleContrast.toFixed(1)}-${config.speckleSharpness}-${config.speckleTone}-${config.grainOpacity}-${config.noiseType}`;
+    return `mockup-g-${config.seed}-${config.baseFrequencyX.toFixed(3)}-${config.baseFrequencyY.toFixed(3)}-${config.grainScale.toFixed(2)}-${config.numOctaves}-${config.blur.toFixed(1)}-${config.speckleDensity}-${config.speckleContrast.toFixed(1)}-${config.speckleSharpness}-${config.speckleTone}-${config.grainOpacity}-${config.noiseType}`;
   }, [
     config.seed,
     config.baseFrequencyX,
     config.baseFrequencyY,
+    config.grainScale,
     config.numOctaves,
     config.blur,
     config.speckleDensity,
