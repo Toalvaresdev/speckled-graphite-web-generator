@@ -44,6 +44,11 @@ export const App: React.FC = () => {
     onRedo: redo,
     onToggleExport: () => setIsExportOpen((prev) => !prev),
     onToggleHelp: () => setIsShortcutsOpen((prev) => !prev),
+    onCloseModals: () => {
+      setIsExportOpen(false);
+      setIsShortcutsOpen(false);
+      setIsFeedbackOpen(false);
+    },
   });
 
   return (

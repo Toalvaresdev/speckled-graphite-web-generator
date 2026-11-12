@@ -115,9 +115,12 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150 cursor-pointer"
+      onClick={onClose}
+    >
       <div 
-        className="w-full max-w-xl bg-studio-900 border border-studio-700/80 rounded-2xl shadow-studio overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-xl bg-studio-900 border border-studio-700/80 rounded-2xl shadow-studio overflow-hidden flex flex-col max-h-[90vh] cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}

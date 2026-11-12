@@ -21,9 +21,12 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200 cursor-pointer"
+      onClick={onClose}
+    >
       <div 
-        className="w-full max-w-md bg-studio-900 border border-studio-700 rounded-2xl shadow-studio overflow-hidden"
+        className="w-full max-w-md bg-studio-900 border border-studio-700 rounded-2xl shadow-studio overflow-hidden cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-studio-800 flex items-center justify-between">

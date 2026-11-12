@@ -6,6 +6,7 @@ interface KeyboardShortcutOptions {
   onRedo: () => void;
   onToggleExport: () => void;
   onToggleHelp: () => void;
+  onCloseModals?: () => void;
 }
 
 export function useKeyboardShortcuts({
@@ -14,9 +15,18 @@ export function useKeyboardShortcuts({
   onRedo,
   onToggleExport,
   onToggleHelp,
+  onCloseModals,
 }: KeyboardShortcutOptions) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Escape closes open modals even if focused in an input
+      if (e.key === 'Escape') {
+        if (onCloseModals) {
+          onCloseModals();
+        }
+        return;
+      }
+
       // Ignore if user is currently typing in an input or textarea
       const target = e.target as HTMLElement;
       if (
@@ -68,5 +78,5 @@ export function useKeyboardShortcuts({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onGenerate, onUndo, onRedo, onToggleExport, onToggleHelp]);
+  }, [onGenerate, onUndo, onRedo, onToggleExport, onToggleHelp, onCloseModals]);
 }

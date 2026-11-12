@@ -133,9 +133,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150 cursor-pointer"
+      onClick={onClose}
+    >
       <div 
-        className="w-full max-w-lg bg-studio-900 border border-studio-700/80 rounded-2xl shadow-studio overflow-hidden flex flex-col"
+        className="w-full max-w-lg bg-studio-900 border border-studio-700/80 rounded-2xl shadow-studio overflow-hidden flex flex-col cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with Mode Switcher matching InstantGradient */}
