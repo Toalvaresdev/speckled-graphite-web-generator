@@ -9,8 +9,7 @@ import {
   Bug, 
   ThumbsUp, 
   ExternalLink,
-  Heart,
-  Cloud
+  Heart
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { fetchFeedback, insertFeedback, upvoteFeedback } from '../../utils/supabase';
@@ -23,6 +22,7 @@ interface FeedbackModalProps {
 export interface FeedbackItem {
   id: string;
   author: string;
+  email?: string;
   location?: string;
   category: 'idea' | 'texture' | 'bug' | 'praise';
   comment: string;
@@ -54,6 +54,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
         const mapped: FeedbackItem[] = remote.map((r) => ({
           id: r.id,
           author: r.author,
+          email: r.email,
           location: r.location || 'Global Visitor',
           category: r.category,
           comment: r.comment,
@@ -105,6 +106,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
     const newFeedback: FeedbackItem = {
       id: String(Date.now()),
       author: authorName,
+      email: email.trim() || undefined,
       location: locationStr,
       category,
       comment: commentText.trim(),
@@ -128,6 +130,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
     try {
       const inserted = await insertFeedback({
         author: authorName,
+        email: email.trim() || undefined,
         location: locationStr,
         category,
         comment: commentText.trim(),
@@ -198,9 +201,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
             <div>
               <h2 className="text-sm font-bold text-white flex items-center gap-2">
                 <span>{t.feedbackModal.title}</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 flex items-center gap-1">
-                  <Cloud className="w-2.5 h-2.5 text-emerald-400" />
-                  <span>Cloud Live</span>
+                <span className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 font-medium ml-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Live</span>
                 </span>
               </h2>
               <p className="text-xs text-studio-400">
@@ -382,11 +385,6 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
                   <ExternalLink className="w-3 h-3 text-studio-400" />
                 </button>
               </div>
-
-              {/* Explanation Note */}
-              <p className="text-[11px] text-studio-500 leading-relaxed bg-studio-950/40 p-2.5 rounded-lg border border-studio-800/60">
-                💡 <span className="text-studio-400">{t.feedbackModal.persistenceNotice}</span>
-              </p>
             </form>
           ) : (
             <div className="space-y-3">

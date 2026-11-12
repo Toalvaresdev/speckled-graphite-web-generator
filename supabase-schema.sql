@@ -5,6 +5,7 @@
 create table if not exists public.feedback (
   id uuid default gen_random_uuid() primary key,
   author text not null default 'Anonymous Designer',
+  email text,
   location text default 'Global Visitor',
   category text not null default 'idea',
   comment text not null,
@@ -12,6 +13,9 @@ create table if not exists public.feedback (
   upvotes integer default 1,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- If you already created the table without email, simply run this 1-line query:
+-- alter table public.feedback add column if not exists email text;
 
 -- Enable Row Level Security (RLS)
 alter table public.feedback enable row level security;

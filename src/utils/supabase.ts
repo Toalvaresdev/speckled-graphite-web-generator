@@ -8,6 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 export interface FeedbackRow {
   id: string;
   author: string;
+  email?: string;
   location?: string;
   category: 'idea' | 'texture' | 'bug' | 'praise';
   comment: string;
@@ -36,19 +37,35 @@ export async function fetchFeedback(): Promise<FeedbackRow[]> {
 
 export async function insertFeedback(feedback: {
   author: string;
+  email?: string;
   location?: string;
   category: string;
   comment: string;
   sentiment: string;
 }): Promise<FeedbackRow | null> {
   try {
+    const payload: Record<string, any> = { ...feedback };
+    if (!payload.email) {
+      delete payload.email;
+    }
+
     const { data, error } = await supabase
       .from('feedback')
-      .insert([feedback])
+      .insert([payload])
       .select()
       .single();
 
     if (error) {
+      // If error is due to email column not added yet to Supabase, retry without email
+      if (payload.email && error.message.toLowerCase().includes('email')) {
+        delete payload.email;
+        const retry = await supabase
+          .from('feedback')
+          .insert([payload])
+          .select()
+          .single();
+        return retry.data || null;
+      }
       console.warn('Supabase insertFeedback:', error.message);
       return null;
     }
