@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #060709;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Container for the preview stage */
+    .viewport {
+      width: 960px;
+      height: 1680px;
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      background: #090a0d;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Background gradient layer */
+    .bg-gradient {
+      position: absolute;
+      inset: 0;
+      transition: background 0.4s ease;
+    }
+
+    /* SVG Filter layer */
+    .noise-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Vignette overlay */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+      pointer-events: none;
+    }
+
+    /* Stage content layout */
+    .stage-content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 70px 60px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #1e222b;
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #f97316;
+      box-shadow: 0 0 16px #f97316;
+    }
+
+    .brand-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .brand-text span {
+      color: #f97316;
+    }
+
+    .badge-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      padding: 8px 18px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #abb5c4;
+    }
+
+    /* Center Message / Cards */
+    .center-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Hook Card (Scene 1) */
+    .hook-box {
+      background: rgba(17, 19, 24, 0.85);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 32px;
+      padding: 50px 40px;
+      max-width: 820px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      backdrop-blur: 20px;
+      transform: scale(1);
+      transition: all 0.4s ease;
+    }
+
+    .hook-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: #f97316;
+      background: rgba(249, 115, 22, 0.15);
+      border: 1px solid rgba(249, 115, 22, 0.4);
+      padding: 8px 20px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+
+    .hook-title {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+
+    .hook-desc {
+      font-size: 24px;
+      color: #818d9f;
+      line-height: 1.4;
+    }
+
+    /* Spacebar prompt */
+    .spacebar-prompt {
+      margin-top: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: #111318;
+      border: 2px solid rgba(255,255,255,0.2);
+      padding: 14px 28px;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      color: #abb5c4;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .spacebar-key {
+      background: #f97316;
+      color: #ffffff;
+      padding: 6px 18px;
+      border-radius: 10px;
+      font-weight: 800;
+      box-shadow: 0 0 25px rgba(249, 115, 22, 0.8);
+      font-size: 18px;
+    }
+
+    /* Mockup Card (Scene 2 & 3) */
+    .mockup-card {
+      display: none;
+      width: 780px;
+      border-radius: 32px;
+      background: rgba(17, 19, 24, 0.92);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .mockup-header {
+      height: 280px;
+      position: relative;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .mockup-body {
+      padding: 40px;
+    }
+
+    /* Bottom Bar */
+    .bottom-info {
+      background: rgba(17, 19, 24, 0.9);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .code-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      color: #10b981;
+      font-weight: 700;
+    }
+
+    .url-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: #abb5c4;
+    }
+
+    /* Floating style label */
+    .style-label {
+      position: absolute;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      backdrop-blur: 16px;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 10px 24px;
+      border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f97316;
+      display: none;
+      z-index: 20;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dynamic SVG Filter Definition -->
+  <svg width="0" height="0" style="position: absolute;">
+    <defs>
+      <filter id="promo-filter" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+        <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.95 0.95" numOctaves="4" seed="42" stitchTiles="stitch" result="rawNoise"/>
+        <feColorMatrix type="saturate" values="0" in="rawNoise" result="grayNoise"/>
+        <feComponentTransfer id="comp" in="grayNoise" result="thresholdSpeckles">
+          <feFuncR id="fr" type="linear" slope="55" intercept="-48" />
+          <feFuncG id="fg" type="linear" slope="55" intercept="-48" />
+          <feFuncB id="fb" type="linear" slope="55" intercept="-48" />
+        </feComponentTransfer>
+        <feColorMatrix in="thresholdSpeckles" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0" result="tintedSpeckles"/>
+        <feComponentTransfer in="tintedSpeckles" result="finalGraphite">
+          <feFuncA id="fa" type="linear" slope="0.9" intercept="0" />
+        </feComponentTransfer>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="viewport">
+    <!-- Background Gradient -->
+    <div id="bgGrad" class="bg-gradient" style="background: #090a0d;"></div>
+
+    <!-- Live Noise Layer -->
+    <svg id="noiseLayer" class="noise-overlay">
+      <rect width="100%" height="100%" filter="url(#promo-filter)" />
+    </svg>
+
+    <div class="vignette"></div>
+
+    <div id="styleLabel" class="style-label">⚡ KILOWATTY DARK SPARKLE</div>
+
+    <div class="stage-content">
+      <!-- Top Brand -->
+      <div class="header">
+        <div class="brand">
+          <div class="brand-icon">
+            <div class="brand-dot"></div>
+          </div>
+          <div class="brand-text">Speckled<span>Graphite</span></div>
+        </div>
+        <div class="badge-tag">CSS & SVG GENERATOR</div>
+      </div>
+
+      <!-- Center Stage -->
+      <div class="center-stage">
+        <!-- Hook Box (Scene 1) -->
+        <div id="hookBox" class="hook-box">
+          <div class="hook-badge">WEB DESIGN DILEMMA</div>
+          <h1 class="hook-title">Stop using flat black backgrounds or 3MB images.</h1>
+          <p class="hook-desc">Simulate tactile, organic speckled graphite and charcoal textures natively in CSS.</p>
+          <div class="spacebar-prompt">
+            <span>Press</span>
+            <span class="spacebar-key">SPACEBAR</span>
+            <span>to generate</span>
+          </div>
+        </div>
+
+        <!-- SaaS Mockup Card (Scene 2 & 3) -->
+        <div id="mockupCard" class="mockup-card">
+          <div id="mockupHeader" class="mockup-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 100px; font-size: 15px; font-weight: 700;">ENTERPRISE NODE</span>
+              <span style="font-size: 20px;">✦</span>
+            </div>
+            <div>
+              <h2 id="cardTitle" style="font-size: 38px; font-weight: 900; letter-spacing: -0.5px;">Rapid Charging Network</h2>
+              <p style="font-size: 18px; color: rgba(255,255,255,0.7); margin-top: 4px;">Every 20 miles on the A1 highway</p>
+            </div>
+          </div>
+          <div class="mockup-body">
+            <div style="display: flex; justify-content: space-between; font-size: 17px; color: #818d9f; margin-bottom: 14px;">
+              <span>Cluster Performance</span>
+              <span style="font-family: 'JetBrains Mono', monospace; color: #10b981; font-weight: 700;">99.98% SPEED</span>
+            </div>
+            <div style="background: #090a0d; height: 12px; border-radius: 100px; overflow: hidden; margin-bottom: 24px;">
+              <div style="background: #f97316; height: 100%; width: 88%; border-radius: 100px;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #abb5c4; font-size: 16px;">Verified Native feTurbulence Filter</span>
+              <span style="background: #f97316; color: #fff; padding: 10px 24px; border-radius: 14px; font-weight: 700; font-size: 16px;">EXPLORE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="bottom-info">
+        <div class="code-badge">
+          <span>⚡</span>
+          <span id="statText">&lt; 1 KB PURE CSS • ZERO HTTP CALLS</span>
+        </div>
+        <div class="url-badge">speckled-graphite.vercel.app</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Frame controller called by puppeteer
+    window.renderFrame = function(sec) {
+      const bgGrad = document.getElementById('bgGrad');
+      const noiseLayer = document.getElementById('noiseLayer');
+      const hookBox = document.getElementById('hookBox');
+      const mockupCard = document.getElementById('mockupCard');
+      const styleLabel = document.getElementById('styleLabel');
+      const turb = document.getElementById('turb');
+      const cardTitle = document.getElementById('cardTitle');
+      const statText = document.getElementById('statText');
+
+      // Timeline logic
+      if (sec < 3.0) {
+        // Scene 1: Flat hook
+        bgGrad.style.background = '#090a0d';
+        noiseLayer.style.opacity = '0';
+        hookBox.style.display = 'block';
+        mockupCard.style.display = 'none';
+        styleLabel.style.display = 'none';
+      } else if (sec < 7.0) {
+        // Scene 2: Space pressed! Kilowatty Sparkle boom!
+        bgGrad.style.background = 'radial-gradient(circle at center, #1b202c 0%, #08090d 80%, #030405 100%)';
+        noiseLayer.style.opacity = '0.95';
+        turb.setAttribute('baseFrequency', '0.92 0.92');
+        turb.setAttribute('numOctaves', '4');
+        turb.setAttribute('seed', '2024');
+
+        hookBox.style.display = 'none';
+        mockupCard.style.display = 'block';
+        styleLabel.style.display = 'block';
+        styleLabel.innerText = '⚡ KILOWATTY DARK SPARKLE (100% CSS)';
+        cardTitle.innerText = 'Rapid Charging Network';
+      } else if (sec < 10.5) {
+        // Scene 3: Instant Ocean Preset
+        bgGrad.style.background = 'linear-gradient(135deg, #040606 0%, #00364a 35%, #002e7a 75%, #14434e 100%)';
+        turb.setAttribute('baseFrequency', '0.78 0.78');
+        turb.setAttribute('seed', '9841');
+        styleLabel.innerText = '🌊 INSTANT OCEAN SHADER';
+        cardTitle.innerText = 'Deep Cyan & Mineral Stipple';
+      } else {
+        // Scene 4: Charcoal & Outro CTA
+        bgGrad.style.background = 'radial-gradient(circle at center, #262933 0%, #0e1014 70%, #060709 100%)';
+        turb.setAttribute('baseFrequency', '0.85 0.85');
+        turb.setAttribute('seed', '7732');
+        styleLabel.innerText = '✏️ PURE GRAPHITE HB & CHARCOAL';
+        cardTitle.innerText = 'Generate & Export 4K Free';
+        statText.innerText = 'FREE ONLINE GENERATOR • 4K EXPORT';
+      }
+    };
+
+    // Default initial frame
+    window.renderFrame(0);
+  </script>
+</body>
+</html>

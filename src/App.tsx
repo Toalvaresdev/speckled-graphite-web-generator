@@ -11,6 +11,7 @@ import { MockupViewer } from './components/Preview/MockupViewer';
 import { BottomBar } from './components/BottomBar/BottomBar';
 import { ExportModal } from './components/Header/ExportModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
+import { FeedbackModal } from './components/Header/FeedbackModal';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
@@ -31,6 +32,7 @@ export const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   // Sync state with URL hash
   useUrlSync(config, setConfig);
@@ -56,6 +58,7 @@ export const App: React.FC = () => {
         onRedo={redo}
         onOpenExport={() => setIsExportOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        onOpenFeedback={() => setIsFeedbackOpen(true)}
       />
 
       {/* Main Workspace */}
@@ -98,6 +101,12 @@ export const App: React.FC = () => {
       <ShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* Community Feedback & Comments Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
       />
 
       {/* Vercel Web Analytics & Speed Insights */}
