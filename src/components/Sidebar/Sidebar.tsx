@@ -10,6 +10,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { GraphiteConfig, DesignPreset } from '../../types/graphite';
+import { useLanguage } from '../../i18n/LanguageContext';
 import { NoiseControls } from './NoiseControls';
 import { SpeckleControls } from './SpeckleControls';
 import { BlendControls } from './BlendControls';
@@ -31,6 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   setIsOpen,
 }) => {
+  const { t } = useLanguage();
   const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
     speckles: true,
     noise: true,
@@ -54,11 +56,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          title="Abrir Controles"
+          title={t.sidebar.open}
           className="absolute left-4 top-4 z-20 p-2.5 rounded-xl bg-studio-900 border border-studio-700 text-studio-200 hover:text-white shadow-studio hover:border-accent transition flex items-center gap-2"
         >
           <Sliders className="w-4 h-4 text-accent" />
-          <span className="text-xs font-semibold">Controles</span>
+          <span className="text-xs font-semibold">{t.sidebar.open}</span>
           <ChevronRight className="w-3.5 h-3.5 text-studio-400" />
         </button>
       )}
@@ -73,12 +75,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="h-12 px-4 border-b border-studio-800 flex items-center justify-between bg-studio-950/40 shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono tracking-widest uppercase text-studio-400 font-semibold">
-              CONTROLES & SHADERS
+              {t.sidebar.title}
             </span>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            title="Contraer panel"
+            title={t.sidebar.collapse}
             className="p-1 rounded-md text-studio-400 hover:text-white hover:bg-studio-800 transition"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -88,12 +90,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Scrollable Control Sections */}
         <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-studio-800/80 custom-scrollbar p-3 pb-16 space-y-4">
           
-          {/* Top Style Picker matching InstantGradient */}
+          {/* Top Style Picker */}
           <div className="pb-1">
             <StylePicker config={config} onSelectPreset={handleApplyPreset} />
           </div>
 
-          {/* Section: Puntos, Motas & Stippling (High Priority) */}
+          {/* Section: Speckles & Stippling */}
           <div className="pt-3">
             <button
               onClick={() => toggleSection('speckles')}
@@ -101,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2">
                 <CircleDot className="w-3.5 h-3.5 text-accent" />
-                <span>Puntos, Motas & Stippling</span>
+                <span>{t.sidebar.specklesSection}</span>
               </div>
               <ChevronDown
                 className={`w-3.5 h-3.5 text-studio-400 transition-transform ${
@@ -124,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2">
                 <Waves className="w-3.5 h-3.5 text-accent" />
-                <span>Ruido feTurbulence</span>
+                <span>{t.sidebar.noiseSection}</span>
               </div>
               <ChevronDown
                 className={`w-3.5 h-3.5 text-studio-400 transition-transform ${
@@ -147,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-accent" />
-                <span>Fusión & Óptica</span>
+                <span>{t.sidebar.blendSection}</span>
               </div>
               <ChevronDown
                 className={`w-3.5 h-3.5 text-studio-400 transition-transform ${
@@ -170,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2">
                 <Maximize2 className="w-3.5 h-3.5 text-accent" />
-                <span>Lienzo & Geometría</span>
+                <span>{t.sidebar.layoutSection}</span>
               </div>
               <ChevronDown
                 className={`w-3.5 h-3.5 text-studio-400 transition-transform ${

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Unlink, Dices } from 'lucide-react';
 import { GraphiteConfig, NoiseType } from '../../types/graphite';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface NoiseControlsProps {
   config: GraphiteConfig;
@@ -8,6 +9,8 @@ interface NoiseControlsProps {
 }
 
 export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConfig }) => {
+  const { t } = useLanguage();
+
   const handleFreqXChange = (val: number) => {
     if (config.linkFrequencies) {
       updateConfig({ baseFrequencyX: val, baseFrequencyY: val });
@@ -38,7 +41,7 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
       {/* Noise Type & Seamless */}
       <div className="space-y-1.5">
         <label className="text-[11px] font-medium text-studio-400 uppercase tracking-wider">
-          Tipo de Ruido feTurbulence
+          {t.noise.type}
         </label>
         <div className="grid grid-cols-2 gap-1.5 p-1 bg-studio-950/80 rounded-lg border border-studio-800">
           {(['fractalNoise', 'turbulence'] as NoiseType[]).map((type) => (
@@ -51,7 +54,7 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
                   : 'text-studio-400 hover:text-studio-200'
               }`}
             >
-              {type === 'fractalNoise' ? 'Fractal (Grafito)' : 'Turbulencia (Carbón)'}
+              {type === 'fractalNoise' ? t.noise.fractal : t.noise.turbulence}
             </button>
           ))}
         </div>
@@ -60,10 +63,10 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
       {/* Base Frequency */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-studio-300 font-medium">Frecuencia Base</span>
+          <span className="text-studio-300 font-medium">{t.noise.baseFreq}</span>
           <button
             onClick={toggleLink}
-            title={config.linkFrequencies ? 'Desvincular ejes X/Y' : 'Vincular ejes X/Y'}
+            title={t.noise.linkFreqs}
             className={`p-1 rounded transition border ${
               config.linkFrequencies
                 ? 'bg-accent/15 border-accent text-accent'
@@ -77,7 +80,7 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
         <div className="space-y-2 bg-studio-950/60 p-2.5 rounded-lg border border-studio-800/80">
           <div>
             <div className="flex justify-between text-[11px] text-studio-400 font-mono mb-1">
-              <span>Freq X</span>
+              <span>{t.noise.freqX}</span>
               <span>{config.baseFrequencyX.toFixed(3)}</span>
             </div>
             <input
@@ -94,7 +97,7 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
           {!config.linkFrequencies && (
             <div>
               <div className="flex justify-between text-[11px] text-studio-400 font-mono mb-1">
-                <span>Freq Y (Estiramiento de veta)</span>
+                <span>{t.noise.freqY}</span>
                 <span>{config.baseFrequencyY.toFixed(3)}</span>
               </div>
               <input
@@ -114,7 +117,7 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
       {/* Octaves */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs">
-          <span className="text-studio-300 font-medium">Octavas (Rugosidad/Detalle)</span>
+          <span className="text-studio-300 font-medium">{t.noise.octaves}</span>
           <span className="text-studio-400 font-mono">{config.numOctaves}</span>
         </div>
         <input
@@ -127,17 +130,16 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
           className="w-full h-1.5 bg-studio-800 rounded-lg appearance-none cursor-pointer accent-accent"
         />
         <div className="flex justify-between text-[10px] text-studio-500 font-mono">
-          <span>1 (Suave)</span>
-          <span>4 (Grafito estándar)</span>
-          <span>6 (Ultra rugoso)</span>
+          <span>1</span>
+          <span>4</span>
+          <span>6</span>
         </div>
       </div>
 
       {/* Seed */}
       <div className="space-y-1.5">
         <label className="text-xs text-studio-300 font-medium flex items-center justify-between">
-          <span>Semilla (Seed)</span>
-          <span className="text-[10px] text-studio-500 font-mono">Variación procedural</span>
+          <span>{t.noise.seed}</span>
         </label>
         <div className="flex gap-2">
           <input
@@ -148,7 +150,7 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
           />
           <button
             onClick={() => updateConfig({ seed: Math.floor(Math.random() * 999999) })}
-            title="Generar nueva semilla"
+            title={t.noise.randomSeed}
             className="px-2.5 py-1.5 bg-studio-850 hover:bg-studio-800 border border-studio-700 rounded-lg text-studio-300 hover:text-white transition"
           >
             <Dices className="w-4 h-4" />
@@ -158,7 +160,7 @@ export const NoiseControls: React.FC<NoiseControlsProps> = ({ config, updateConf
 
       {/* Stitch Tiles */}
       <div className="flex items-center justify-between pt-1">
-        <span className="text-xs text-studio-300 font-medium">Patrón Continuo (Seamless)</span>
+        <span className="text-xs text-studio-300 font-medium">{t.noise.stitch}</span>
         <button
           onClick={() => updateConfig({ stitchTiles: !config.stitchTiles })}
           className={`w-9 h-5 flex items-center rounded-full p-0.5 transition ${

@@ -2,12 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { Sparkles, ArrowRight, ShieldCheck, Zap, Activity, Star } from 'lucide-react';
 import { GraphiteConfig, MockupType } from '../../types/graphite';
 import { generateCssBackground, generateSvgFilterMarkup } from '../../utils/svgGenerator';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface MockupViewerProps {
   config: GraphiteConfig;
 }
 
 export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
+  const { language } = useLanguage();
   const [mockupType, setMockupType] = useState<MockupType>('card');
 
   const backgroundCss = generateCssBackground(config);
@@ -33,6 +35,13 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
     return generateSvgFilterMarkup(config, filterId);
   }, [config, filterId]);
 
+  const tabs: { id: MockupType; label: string }[] = [
+    { id: 'card', label: language === 'es' ? 'Tarjeta SaaS' : 'SaaS Card' },
+    { id: 'hero', label: language === 'es' ? 'Hero Landing' : 'Hero Section' },
+    { id: 'button', label: language === 'es' ? 'Botones & Badges' : 'Buttons & Badges' },
+    { id: 'poster', label: language === 'es' ? 'Póster Minimalista' : 'Minimalist Poster' },
+  ];
+
   return (
     <div className="relative flex-1 h-full min-h-0 flex flex-col items-center justify-start p-6 overflow-y-auto custom-scrollbar bg-studio-950/60">
       {/* Dynamic SVG Filter definition rendered in DOM */}
@@ -42,15 +51,10 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
 
       {/* Top Mockup Selector */}
       <div className="mb-6 flex items-center p-1 bg-studio-900/90 backdrop-blur-md rounded-xl border border-studio-800 shadow-studio shrink-0">
-        {[
-          { id: 'card', label: 'Tarjeta SaaS' },
-          { id: 'hero', label: 'Hero Landing' },
-          { id: 'button', label: 'Botones & Badges' },
-          { id: 'poster', label: 'Póster Minimalista' },
-        ].map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setMockupType(tab.id as MockupType)}
+            onClick={() => setMockupType(tab.id)}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
               mockupType === tab.id
                 ? 'bg-studio-800 text-white shadow-sm font-semibold'
@@ -91,15 +95,21 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
                 <Sparkles className="w-4 h-4 text-white/80" />
               </div>
               <div className="relative z-10">
-                <h3 className="text-xl font-bold text-white tracking-tight">Cifrado de Alta Densidad</h3>
-                <p className="text-xs text-white/75 mt-0.5">Seguridad mineral con textura granular nativa</p>
+                <h3 className="text-xl font-bold text-white tracking-tight">
+                  {language === 'es' ? 'Cifrado de Alta Densidad' : 'High Density Encryption'}
+                </h3>
+                <p className="text-xs text-white/75 mt-0.5">
+                  {language === 'es'
+                    ? 'Seguridad mineral con textura granular nativa'
+                    : 'Mineral security with native granular stippling'}
+                </p>
               </div>
             </div>
 
             {/* Card Body */}
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between text-xs text-studio-400">
-                <span>Rendimiento del Cluster</span>
+                <span>{language === 'es' ? 'Rendimiento del Cluster' : 'Cluster Performance'}</span>
                 <span className="font-mono text-emerald-400 font-semibold">99.98%</span>
               </div>
               <div className="w-full bg-studio-950 rounded-full h-2 overflow-hidden border border-studio-800">
@@ -108,10 +118,10 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
               <div className="pt-2 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs text-studio-300">
                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Verificado con CSS feTurbulence</span>
+                  <span>{language === 'es' ? 'Verificado con CSS feTurbulence' : 'Verified with CSS feTurbulence'}</span>
                 </div>
                 <button className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-studio-800 hover:bg-studio-700 text-white border border-studio-700 transition">
-                  Explorar
+                  {language === 'es' ? 'Explorar' : 'Explore'}
                 </button>
               </div>
             </div>
@@ -140,21 +150,25 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
             <div className="relative z-10 max-w-xl mx-auto space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white backdrop-blur-md border border-white/20">
                 <Zap className="w-3.5 h-3.5 text-accent" />
-                <span>Textura ultraligera &lt; 1KB de peso</span>
+                <span>{language === 'es' ? 'Textura ultraligera < 1KB de peso' : 'Ultra-light texture < 1KB file size'}</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                Texturas orgánicas de grafito con CSS y SVG nativos
+                {language === 'es'
+                  ? 'Texturas orgánicas de grafito con CSS y SVG nativos'
+                  : 'Organic graphite textures with native CSS & SVG'}
               </h2>
               <p className="text-sm text-white/80 leading-relaxed">
-                Reemplaza pesados fondos JPG/PNG con filtros procedurales en tiempo real. Máximo rendimiento para experiencias web de nueva generación.
+                {language === 'es'
+                  ? 'Reemplaza pesados fondos JPG/PNG con filtros procedurales en tiempo real. Máximo rendimiento para experiencias web de nueva generación.'
+                  : 'Replace heavy JPG/PNG hero images with real-time procedural filters. Peak performance for next-gen web apps.'}
               </p>
               <div className="flex items-center justify-center gap-3 pt-2">
                 <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-white shadow-glow transition">
-                  <span>Comenzar Ahora</span>
+                  <span>{language === 'es' ? 'Comenzar Ahora' : 'Get Started'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 transition">
-                  Ver Documentación
+                  {language === 'es' ? 'Ver Documentación' : 'View Documentation'}
                 </button>
               </div>
             </div>
@@ -164,7 +178,9 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
         {/* 3. Buttons & Badges Mockup */}
         {mockupType === 'button' && (
           <div className="w-full max-w-lg p-8 rounded-2xl bg-studio-900/90 border border-studio-800 shadow-2xl space-y-6">
-            <h4 className="text-sm font-semibold text-white">Componentes con Textura de Grafito</h4>
+            <h4 className="text-sm font-semibold text-white">
+              {language === 'es' ? 'Componentes con Textura de Grafito' : 'Graphite Textured UI Elements'}
+            </h4>
             <div className="grid grid-cols-2 gap-4">
               
               {/* Button with textured surface */}
@@ -185,7 +201,7 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
                 </svg>
                 <span className="relative z-10 text-xs font-bold text-white tracking-wide flex items-center justify-center gap-2">
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  Botón Premium
+                  {language === 'es' ? 'Botón Premium' : 'Premium Button'}
                 </span>
               </button>
 
@@ -206,7 +222,9 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
                   />
                 </svg>
                 <Activity className="relative z-10 w-4 h-4 text-emerald-400" />
-                <span className="relative z-10 text-xs font-semibold text-white">Status: Activo</span>
+                <span className="relative z-10 text-xs font-semibold text-white">
+                  {language === 'es' ? 'Status: Activo' : 'Status: Live'}
+                </span>
               </div>
             </div>
           </div>
@@ -231,7 +249,9 @@ export const MockupViewer: React.FC<MockupViewerProps> = ({ config }) => {
             </svg>
             <div className="relative z-10">
               <span className="text-[10px] uppercase font-mono tracking-widest text-white/60">COLLECTION 01</span>
-              <h2 className="text-2xl font-black text-white mt-1">GRAFITO PURO</h2>
+              <h2 className="text-2xl font-black text-white mt-1">
+                {language === 'es' ? 'GRAFITO PURO' : 'PURE GRAPHITE'}
+              </h2>
             </div>
             <div className="relative z-10 space-y-1">
               <div className="w-12 h-1 bg-accent rounded" />

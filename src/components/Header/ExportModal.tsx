@@ -5,6 +5,7 @@ import { GraphiteConfig, AspectRatio } from '../../types/graphite';
 import { generateCssSnippet, generateTailwindSnippet, generateReactJsxSnippet } from '../../utils/cssGenerator';
 import { generateFullSvg } from '../../utils/svgGenerator';
 import { exportToCanvas } from '../../utils/canvasExporter';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ type MainTab = 'image' | 'code';
 type ImageFormat = 'png' | 'webp' | 'jpeg';
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, config }) => {
+  const { t } = useLanguage();
   const [mainTab, setMainTab] = useState<MainTab>('image');
   const [imgFormat, setImgFormat] = useState<ImageFormat>('png');
   const [quality, setQuality] = useState<'1x' | '2x'>('1x');
@@ -53,7 +55,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
       setIsExporting(true);
       const mime =
         imgFormat === 'webp'
-          ? 'image/png' // standard canvas fallback
+          ? 'image/png'
           : imgFormat === 'jpeg'
           ? 'image/jpeg'
           : 'image/png';
@@ -109,7 +111,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
   };
 
   const handleDownloadSvg = () => {
-    // Track SVG download
     try {
       track('download_svg', {
         resolution: `${finalWidth}x${finalHeight}`,
@@ -150,7 +151,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
               }`}
             >
               <ImageIcon className="w-3.5 h-3.5" />
-              <span>Imagen</span>
+              <span>{t.exportModal.downloadTab}</span>
             </button>
             <button
               onClick={() => setMainTab('code')}
@@ -161,7 +162,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
               }`}
             >
               <Code2 className="w-3.5 h-3.5" />
-              <span>Código Web</span>
+              <span>{t.exportModal.codeTab}</span>
             </button>
           </div>
 
@@ -173,13 +174,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
           </button>
         </div>
 
-        {/* Tab 1: Image Export (Matches Screenshot Image 2) */}
+        {/* Tab 1: Image Export */}
         {mainTab === 'image' && (
           <div className="p-6 space-y-5">
             {/* FORMAT */}
             <div className="space-y-2">
               <label className="text-[11px] font-mono tracking-wider text-studio-400 uppercase font-semibold">
-                FORMAT
+                {t.exportModal.format}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -205,7 +206,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
             {/* QUALITY */}
             <div className="space-y-2">
               <label className="text-[11px] font-mono tracking-wider text-studio-400 uppercase font-semibold">
-                QUALITY
+                {t.exportModal.quality}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {[
@@ -231,7 +232,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-mono tracking-wider text-studio-400 uppercase font-semibold">
-                  SIZE
+                  {t.exportModal.ratio}
                 </label>
                 <span className="font-mono text-[11px] text-accent font-semibold">
                   {finalWidth} × {finalHeight} px
@@ -281,7 +282,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
               </div>
             </div>
 
-            {/* Primary Action Button (Matches Screenshot: Export PNG • 1920x1080) */}
+            {/* Primary Action Button */}
             <div className="pt-2">
               <button
                 onClick={handleDownloadImage}
@@ -291,8 +292,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
                 <Download className="w-4 h-4" />
                 <span>
                   {isExporting
-                    ? 'Renderizando imagen...'
-                    : `Export ${imgFormat.toUpperCase()} • ${finalWidth}×${finalHeight}`}
+                    ? t.exportModal.downloading
+                    : `${t.exportModal.downloadButton} (${imgFormat.toUpperCase()} • ${finalWidth}×${finalHeight})`}
                 </span>
               </button>
             </div>
@@ -326,7 +327,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
             {codeType === 'css' && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-studio-400">
-                  <span>CSS puro con filtro SVG incrustado</span>
+                  <span>{t.exportModal.cssSnippet}</span>
                   <span className="font-mono text-emerald-400">&lt; 1 KB</span>
                 </div>
                 <div className="relative">
@@ -338,7 +339,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
                     className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-studio-800 hover:bg-studio-700 text-white border border-studio-600 transition"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copiado' : 'Copiar CSS'}</span>
+                    <span>{copied ? t.exportModal.copied : t.exportModal.copyButton}</span>
                   </button>
                 </div>
               </div>
@@ -347,13 +348,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
             {codeType === 'svg' && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-studio-400">Archivo SVG vectorial independiente</span>
+                  <span className="text-xs text-studio-400">SVG</span>
                   <button
                     onClick={handleDownloadSvg}
                     className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-accent hover:bg-accent-hover text-white transition"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Descargar .svg</span>
+                    <span>{t.exportModal.downloadSvgButton}</span>
                   </button>
                 </div>
                 <div className="relative">
@@ -365,7 +366,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
                     className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-studio-800 hover:bg-studio-700 text-white border border-studio-600 transition"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copiado' : 'Copiar SVG'}</span>
+                    <span>{copied ? t.exportModal.copied : t.exportModal.copyButton}</span>
                   </button>
                 </div>
               </div>
@@ -373,7 +374,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
 
             {codeType === 'tailwind' && (
               <div className="space-y-3">
-                <span className="text-xs text-studio-400">Configuración para Tailwind CSS</span>
+                <span className="text-xs text-studio-400">{t.exportModal.tailwindSnippet}</span>
                 <div className="relative">
                   <pre className="p-4 bg-studio-950 rounded-xl border border-studio-800 font-mono text-xs text-studio-200 overflow-x-auto max-h-56 leading-relaxed">
                     {generateTailwindSnippet(config)}
@@ -383,7 +384,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
                     className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-studio-800 hover:bg-studio-700 text-white border border-studio-600 transition"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copiado' : 'Copiar'}</span>
+                    <span>{copied ? t.exportModal.copied : t.exportModal.copyButton}</span>
                   </button>
                 </div>
               </div>
@@ -391,7 +392,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
 
             {codeType === 'react' && (
               <div className="space-y-3">
-                <span className="text-xs text-studio-400">Componente autónomo para React y Next.js</span>
+                <span className="text-xs text-studio-400">{t.exportModal.reactSnippet}</span>
                 <div className="relative">
                   <pre className="p-4 bg-studio-950 rounded-xl border border-studio-800 font-mono text-xs text-studio-200 overflow-x-auto max-h-56 leading-relaxed">
                     {generateReactJsxSnippet(config)}
@@ -401,7 +402,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
                     className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-studio-800 hover:bg-studio-700 text-white border border-studio-600 transition"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copiado' : 'Copiar'}</span>
+                    <span>{copied ? t.exportModal.copied : t.exportModal.copyButton}</span>
                   </button>
                 </div>
               </div>

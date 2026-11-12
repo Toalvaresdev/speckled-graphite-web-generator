@@ -1,6 +1,7 @@
 import React from 'react';
 import { Eye, Droplets, Sparkles, Layers } from 'lucide-react';
 import { GraphiteConfig, BlendMode } from '../../types/graphite';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface BlendControlsProps {
   config: GraphiteConfig;
@@ -8,23 +9,25 @@ interface BlendControlsProps {
 }
 
 const BLEND_MODES: { label: string; value: BlendMode }[] = [
-  { label: 'Overlay (Recomendado)', value: 'overlay' },
-  { label: 'Multiply (Profundo)', value: 'multiply' },
-  { label: 'Soft Light (Sutil)', value: 'soft-light' },
-  { label: 'Screen (Luminoso)', value: 'screen' },
-  { label: 'Color Dodge (Vibrante)', value: 'color-dodge' },
-  { label: 'Hard Light (Intenso)', value: 'hard-light' },
+  { label: 'Overlay', value: 'overlay' },
+  { label: 'Multiply', value: 'multiply' },
+  { label: 'Soft Light', value: 'soft-light' },
+  { label: 'Screen', value: 'screen' },
+  { label: 'Color Dodge', value: 'color-dodge' },
+  { label: 'Hard Light', value: 'hard-light' },
   { label: 'Normal', value: 'normal' },
 ];
 
 export const BlendControls: React.FC<BlendControlsProps> = ({ config, updateConfig }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-4">
       {/* Blend Mode */}
       <div className="space-y-1.5">
         <label className="text-xs text-studio-300 font-medium flex items-center gap-1.5">
           <Layers className="w-3.5 h-3.5 text-studio-400" />
-          <span>Modo de Mezcla (Blend Mode)</span>
+          <span>{t.blend.mode}</span>
         </label>
         <select
           value={config.blendMode}
@@ -44,7 +47,7 @@ export const BlendControls: React.FC<BlendControlsProps> = ({ config, updateConf
         <div className="flex justify-between text-xs">
           <span className="text-studio-300 font-medium flex items-center gap-1.5">
             <Eye className="w-3.5 h-3.5 text-studio-400" />
-            <span>Opacidad de la Textura</span>
+            <span>{t.blend.opacity}</span>
           </span>
           <span className="text-studio-400 font-mono">{config.grainOpacity}%</span>
         </div>
@@ -64,7 +67,7 @@ export const BlendControls: React.FC<BlendControlsProps> = ({ config, updateConf
         <div className="flex justify-between text-xs">
           <span className="text-studio-300 font-medium flex items-center gap-1.5">
             <Droplets className="w-3.5 h-3.5 text-studio-400" />
-            <span>Difuminado Óptico (Blur)</span>
+            <span>{t.blend.blur}</span>
           </span>
           <span className="text-studio-400 font-mono">{config.blur.toFixed(1)}px</span>
         </div>
@@ -78,8 +81,7 @@ export const BlendControls: React.FC<BlendControlsProps> = ({ config, updateConf
           className="w-full h-1.5 bg-studio-800 rounded-lg appearance-none cursor-pointer accent-accent"
         />
         <div className="flex justify-between text-[10px] text-studio-500 font-mono">
-          <span>0 (Grano puro)</span>
-          <span>Difuso / Grafito emborronado</span>
+          <span>{t.blend.blurNotice}</span>
         </div>
       </div>
 
@@ -89,8 +91,8 @@ export const BlendControls: React.FC<BlendControlsProps> = ({ config, updateConf
           <div className="flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-accent" />
             <div className="flex flex-col">
-              <span className="text-xs text-studio-200 font-medium">Brillo Especular de Grafito</span>
-              <span className="text-[10px] text-studio-500">Simula el reflejo metálico bajo la luz</span>
+              <span className="text-xs text-studio-200 font-medium">{t.blend.lighting}</span>
+              <span className="text-[10px] text-studio-500">{t.blend.lightingDesc}</span>
             </div>
           </div>
           <button
@@ -106,7 +108,7 @@ export const BlendControls: React.FC<BlendControlsProps> = ({ config, updateConf
         {config.surfaceLighting && (
           <div className="pl-5 pt-1 space-y-1">
             <div className="flex justify-between text-[11px] text-studio-400 font-mono">
-              <span>Intensidad de Luz</span>
+              <span>{t.blend.lightIntensity}</span>
               <span>{(config.lightIntensity * 100).toFixed(0)}%</span>
             </div>
             <input

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check, Sparkles, X } from 'lucide-react';
 import { GraphiteConfig, DesignPreset } from '../../types/graphite';
 import { DESIGN_PRESETS } from '../../constants/presets';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface StylePickerProps {
   config: GraphiteConfig;
@@ -9,6 +10,7 @@ interface StylePickerProps {
 }
 
 export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset }) => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [popoverPos, setPopoverPos] = useState<{ top: number; left: number }>({ top: 80, left: 340 });
   
@@ -22,6 +24,16 @@ export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset
       Math.abs((p.config.baseFrequencyX || 0) - config.baseFrequencyX) < 0.08
   ) || DESIGN_PRESETS[0];
 
+  const getPresetName = (preset: DesignPreset) => {
+    const localized = t.presets[preset.id as keyof typeof t.presets];
+    return localized?.name || preset.name;
+  };
+
+  const getPresetTag = (preset: DesignPreset) => {
+    const localized = t.presets[preset.id as keyof typeof t.presets];
+    return localized?.tag || preset.tag;
+  };
+
   const updatePosition = () => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -33,7 +45,7 @@ export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset
           left: 16,
         });
       } else {
-        // Position right next to the sidebar floating over the canvas (like InstantGradient)
+        // Position right next to the sidebar floating over the canvas
         const top = Math.max(16, Math.min(rect.top, window.innerHeight - 520));
         setPopoverPos({
           top,
@@ -93,17 +105,17 @@ export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset
 
   // Group presets
   const categories = [
-    { title: 'INSTANTSHADER • GRAFITO & MINERAL', items: DESIGN_PRESETS.slice(0, 4) },
-    { title: 'PAPER SHADERS • STIPPLING & CÓSMICO', items: DESIGN_PRESETS.slice(4) },
+    { title: t.stylePicker.shadersGroup, items: DESIGN_PRESETS.slice(0, 4) },
+    { title: t.stylePicker.stipplingGroup, items: DESIGN_PRESETS.slice(4) },
   ];
 
   return (
     <div className="relative select-none">
       {/* Header Label matching InstantGradient */}
       <div className="flex items-center justify-between text-[11px] font-mono text-studio-400 mb-1.5 px-0.5">
-        <span className="font-semibold uppercase tracking-wider">STYLE</span>
+        <span className="font-semibold uppercase tracking-wider">{t.sidebar.style}</span>
         <span className="text-[10px] text-studio-500 hover:text-accent cursor-pointer transition">
-          tab to cycle
+          {t.sidebar.tabToCycle}
         </span>
       </div>
 
@@ -135,10 +147,10 @@ export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset
 
           <div className="text-left">
             <div className="text-xs font-semibold text-white group-hover:text-accent transition">
-              {activePreset.name}
+              {getPresetName(activePreset)}
             </div>
             <div className="text-[10px] font-mono text-studio-400">
-              {activePreset.tag} • InstantShader
+              {getPresetTag(activePreset)} • InstantShader
             </div>
           </div>
         </div>
@@ -148,7 +160,7 @@ export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset
         />
       </button>
 
-      {/* Fixed Floating Popover (Floats cleanly to the right over the canvas without clipping) */}
+      {/* Fixed Floating Popover */}
       {isOpen && (
         <div
           ref={popoverRef}
@@ -163,7 +175,7 @@ export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               <span className="text-xs font-semibold text-white font-mono tracking-wide">
-                SELECT STYLE PRESET
+                {t.stylePicker.allPresets}
               </span>
             </div>
             <button
@@ -220,10 +232,10 @@ export const StylePicker: React.FC<StylePickerProps> = ({ config, onSelectPreset
 
                       <div>
                         <div className="text-[11px] font-semibold text-white group-hover:text-accent transition line-clamp-1">
-                          {preset.name}
+                          {getPresetName(preset)}
                         </div>
                         <div className="text-[9px] text-studio-400 font-mono">
-                          {preset.tag}
+                          {getPresetTag(preset)}
                         </div>
                       </div>
                     </button>

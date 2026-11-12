@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Command } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface ShortcutsModalProps {
   isOpen: boolean;
@@ -7,14 +8,16 @@ interface ShortcutsModalProps {
 }
 
 export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose }) => {
+  const { t, language } = useLanguage();
   if (!isOpen) return null;
 
   const shortcuts = [
-    { key: 'Espacio', action: 'Generar nueva semilla de grafito / variación' },
-    { key: 'Ctrl + Z / ⌘Z', action: 'Deshacer cambio anterior' },
-    { key: 'Ctrl + Y / ⌘⇧Z', action: 'Rehacer cambio' },
-    { key: 'Ctrl + E / ⌘E', action: 'Abrir ventana de exportación' },
-    { key: '?', action: 'Mostrar este menú de atajos' },
+    { key: language === 'es' ? 'Espacio' : 'Space', action: t.shortcuts.space },
+    { key: 'Ctrl + Z / ⌘Z', action: t.shortcuts.undo },
+    { key: 'Ctrl + Y / ⌘⇧Z', action: t.shortcuts.redo },
+    { key: 'Ctrl + E / ⌘E', action: t.shortcuts.export },
+    { key: 'Tab', action: t.shortcuts.styleCycle },
+    { key: '?', action: t.shortcuts.help },
   ];
 
   return (
@@ -26,7 +29,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
         <div className="px-6 py-4 border-b border-studio-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Command className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-semibold text-white">Atajos de Teclado</h3>
+            <h3 className="text-sm font-semibold text-white">{t.shortcuts.title}</h3>
           </div>
           <button
             onClick={onClose}

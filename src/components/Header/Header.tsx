@@ -11,6 +11,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { ViewMode } from '../../types/graphite';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface HeaderProps {
   viewMode: ViewMode;
@@ -35,6 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenShortcuts,
   onOpenFeedback,
 }) => {
+  const { t, language, setLanguage } = useLanguage();
   const [copiedLink, setCopiedLink] = useState(false);
 
   const handleShare = () => {
@@ -55,8 +57,8 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="font-semibold text-sm tracking-wide text-white font-mono">
               Speckled<span className="text-accent">Graphite</span>
             </span>
-            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-studio-800 text-studio-400 border border-studio-700/60">
-              v1.0 • Native SVG/CSS
+            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-studio-800 text-studio-400 border border-studio-700/60 hidden sm:inline-block">
+              {t.header.subtitle}
             </span>
           </div>
         </div>
@@ -73,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           <Monitor className="w-3.5 h-3.5" />
-          <span>Canvas</span>
+          <span>{t.header.canvas}</span>
         </button>
         <button
           onClick={() => setViewMode('mockup')}
@@ -84,17 +86,44 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
-          <span>UI Mockups</span>
+          <span>{t.header.mockups}</span>
         </button>
       </div>
 
-      {/* Right Controls: Undo/Redo, Feedback, GitHub, Shortcuts, Share & Export */}
+      {/* Right Controls: Language, Undo/Redo, Feedback, GitHub, Shortcuts, Share & Export */}
       <div className="flex items-center gap-2">
+        {/* Language Switcher Pill */}
+        <div className="flex items-center bg-studio-950/80 rounded-lg border border-studio-800 p-0.5 text-xs font-mono">
+          <button
+            onClick={() => setLanguage('es')}
+            title="Cambiar a Español"
+            className={`px-2 py-1 rounded text-[11px] font-bold transition ${
+              language === 'es'
+                ? 'bg-accent/20 text-accent font-extrabold border border-accent/30'
+                : 'text-studio-400 hover:text-white'
+            }`}
+          >
+            ES
+          </button>
+          <button
+            onClick={() => setLanguage('en')}
+            title="Switch to English"
+            className={`px-2 py-1 rounded text-[11px] font-bold transition ${
+              language === 'en'
+                ? 'bg-accent/20 text-accent font-extrabold border border-accent/30'
+                : 'text-studio-400 hover:text-white'
+            }`}
+          >
+            EN
+          </button>
+        </div>
+
+        {/* Undo / Redo */}
         <div className="flex items-center bg-studio-950/60 rounded-md border border-studio-800 p-0.5">
           <button
             onClick={onUndo}
             disabled={!canUndo}
-            title="Deshacer (Ctrl+Z)"
+            title={t.header.undo}
             className="p-1.5 rounded text-studio-400 hover:text-white disabled:opacity-30 disabled:hover:text-studio-400 transition"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -102,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onRedo}
             disabled={!canRedo}
-            title="Rehacer (Ctrl+Y)"
+            title={t.header.redo}
             className="p-1.5 rounded text-studio-400 hover:text-white disabled:opacity-30 disabled:hover:text-studio-400 transition"
           >
             <RotateCw className="w-3.5 h-3.5" />
@@ -112,11 +141,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Feedback Button */}
         <button
           onClick={onOpenFeedback}
-          title="Dejar feedback y comentarios de la comunidad"
+          title={t.feedbackModal.title}
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-studio-300 hover:text-white bg-studio-850 hover:bg-studio-800 border border-studio-700/60 transition group"
         >
           <MessageSquare className="w-3.5 h-3.5 text-accent group-hover:scale-110 transition-transform" />
-          <span className="hidden md:inline">Feedback</span>
+          <span className="hidden md:inline">{t.header.feedback}</span>
           <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
         </button>
 
@@ -125,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({
           href="https://github.com/Toalvaresdev/speckled-graphite-web-generator"
           target="_blank"
           rel="noopener noreferrer"
-          title="Ver código fuente y contribuir en GitHub"
+          title="GitHub - Speckled Graphite"
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-studio-300 hover:text-white bg-studio-850 hover:bg-studio-800 border border-studio-700/60 transition"
         >
           <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -134,40 +163,43 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline">GitHub</span>
         </a>
 
+        {/* Shortcuts */}
         <button
           onClick={onOpenShortcuts}
-          title="Atajos de teclado (?)"
+          title={t.header.shortcuts}
           className="p-2 rounded-md text-studio-400 hover:text-white hover:bg-studio-800 transition border border-transparent hover:border-studio-700"
         >
           <HelpCircle className="w-4 h-4" />
         </button>
 
+        {/* Share link */}
         <button
           onClick={handleShare}
-          title="Copiar enlace con diseño actual"
+          title={t.header.share}
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-studio-300 hover:text-white bg-studio-850 hover:bg-studio-800 border border-studio-700/60 transition"
         >
           {copiedLink ? (
             <>
               <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400">¡Copiado!</span>
+              <span className="text-emerald-400">{t.header.copied}</span>
             </>
           ) : (
             <>
               <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Compartir</span>
+              <span className="hidden sm:inline">{t.header.share}</span>
             </>
           )}
         </button>
 
+        {/* Export Button */}
         <button
           onClick={onOpenExport}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent hover:bg-accent-hover text-white shadow-glow transition group"
         >
           <Download className="w-3.5 h-3.5" />
-          <span>Exportar</span>
+          <span>{t.header.export}</span>
           <span className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-black/25 text-[10px] font-mono text-white/90">
-            PNG • 1080p
+            {t.header.exportBadge}
           </span>
         </button>
       </div>

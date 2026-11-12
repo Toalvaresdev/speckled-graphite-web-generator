@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { GraphiteConfig, ColorStop } from '../../types/graphite';
 import { DESIGN_PRESETS } from '../../constants/presets';
+import { useLanguage } from '../../i18n/LanguageContext';
 import { PaletteStrip } from './PaletteStrip';
 
 interface BottomBarProps {
@@ -28,6 +29,8 @@ export const BottomBar: React.FC<BottomBarProps> = ({
   onRandomizePalette,
   onOpenShortcuts,
 }) => {
+  const { t } = useLanguage();
+
   const handleUpdateColor = (id: string, color: string) => {
     const updated = config.colors.map((c) => (c.id === id ? { ...c, color } : c));
     updateConfig({ colors: updated });
@@ -67,6 +70,9 @@ export const BottomBar: React.FC<BottomBarProps> = ({
   const currentIndex = activePresetIndex >= 0 ? activePresetIndex : 0;
   const currentPreset = DESIGN_PRESETS[currentIndex];
 
+  const currentPresetLocalizedName =
+    t.presets[currentPreset?.id as keyof typeof t.presets]?.name || currentPreset?.name || 'Style';
+
   const handlePrevPreset = () => {
     const nextIdx = (currentIndex - 1 + DESIGN_PRESETS.length) % DESIGN_PRESETS.length;
     updateConfig(DESIGN_PRESETS[nextIdx].config);
@@ -89,39 +95,39 @@ export const BottomBar: React.FC<BottomBarProps> = ({
               onClick={() => handleRemoveColor(config.colors[config.colors.length - 1]?.id || '')}
               disabled={config.colors.length <= 2}
               className="p-1 rounded text-studio-400 hover:text-white disabled:opacity-30 transition"
-              title="Quitar color"
+              title={t.bottomBar.removeColor}
             >
               <Minus className="w-3 h-3" />
             </button>
             <span className="px-2 font-mono text-[11px] font-medium text-studio-200">
-              {config.colors.length} colores
+              {config.colors.length} {t.bottomBar.colorsCount}
             </span>
             <button
               onClick={handleAddColor}
               disabled={config.colors.length >= 8}
               className="p-1 rounded text-studio-400 hover:text-white disabled:opacity-30 transition"
-              title="Agregar color"
+              title={t.bottomBar.addColor}
             >
               <Plus className="w-3 h-3" />
             </button>
           </div>
 
-          {/* Style Carousel Switcher < Style > matching InstantGradient */}
+          {/* Style Carousel Switcher < Style > */}
           <div className="hidden sm:flex items-center bg-studio-950/70 border border-studio-800 rounded-lg p-0.5 text-xs text-studio-300">
             <button
               onClick={handlePrevPreset}
               className="p-1 rounded text-studio-400 hover:text-white transition"
-              title="Estilo anterior"
+              title={t.bottomBar.prevStyle}
             >
               <ChevronLeft className="w-3 h-3" />
             </button>
             <span className="px-2 font-mono text-[11px] font-medium text-studio-200 truncate max-w-[130px]">
-              {currentPreset?.name || 'Estilo'}
+              {currentPresetLocalizedName}
             </span>
             <button
               onClick={handleNextPreset}
               className="p-1 rounded text-studio-400 hover:text-white transition"
-              title="Siguiente estilo"
+              title={t.bottomBar.nextStyle}
             >
               <ChevronRight className="w-3 h-3" />
             </button>
@@ -129,11 +135,11 @@ export const BottomBar: React.FC<BottomBarProps> = ({
 
           <button
             onClick={onRandomizePalette}
-            title="Siguiente paleta de colores"
+            title={t.bottomBar.palettes}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-studio-950/70 hover:bg-studio-800 border border-studio-800 text-xs text-studio-300 hover:text-white transition"
           >
             <Palette className="w-3.5 h-3.5 text-accent" />
-            <span className="hidden sm:inline">Paletas</span>
+            <span className="hidden sm:inline">{t.bottomBar.palettes}</span>
           </button>
         </div>
 
@@ -144,15 +150,15 @@ export const BottomBar: React.FC<BottomBarProps> = ({
             className="group relative flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-accent to-orange-500 hover:from-orange-500 hover:to-accent text-white font-semibold text-xs shadow-glow transition-all active:scale-95"
           >
             <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Generar</span>
+            <span>{t.bottomBar.generate}</span>
             <kbd className="hidden sm:inline-block ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-black/30 rounded border border-white/20 group-hover:bg-black/40">
-              Espacio
+              {t.bottomBar.spaceKey}
             </kbd>
           </button>
 
           <button
             onClick={onGenerate}
-            title="Generar nueva variación de diseño y color"
+            title={t.bottomBar.generate}
             className="p-2 rounded-xl bg-studio-950/70 hover:bg-studio-800 border border-studio-800 text-studio-300 hover:text-white transition"
           >
             <Dices className="w-4 h-4" />
@@ -166,7 +172,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-studio-400 hover:text-studio-200 hover:bg-studio-800/60 transition"
           >
             <Command className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline font-mono text-[11px]">Atajos</span>
+            <span className="hidden sm:inline font-mono text-[11px]">{t.bottomBar.shortcuts}</span>
           </button>
         </div>
       </div>

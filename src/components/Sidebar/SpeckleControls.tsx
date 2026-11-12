@@ -1,39 +1,41 @@
 import React from 'react';
 import { Dot, Contrast, SunMedium, ZoomIn, Sparkles, Flame, Layers } from 'lucide-react';
 import { GraphiteConfig, SpeckleTone } from '../../types/graphite';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface SpeckleControlsProps {
   config: GraphiteConfig;
   updateConfig: (updates: Partial<GraphiteConfig>) => void;
 }
 
-const TONES: { id: SpeckleTone; label: string; icon: any; desc: string }[] = [
-  { id: 'silver', label: 'Plateado (Foto)', icon: Sparkles, desc: 'Destellos blancos/plata' },
-  { id: 'dark', label: 'Carbón', icon: Flame, desc: 'Puntos negros de grafito' },
-  { id: 'mixed', label: 'Mixto', icon: Layers, desc: 'Mineral híbrido' },
-];
-
 export const SpeckleControls: React.FC<SpeckleControlsProps> = ({ config, updateConfig }) => {
+  const { t } = useLanguage();
+
+  const tones: { id: SpeckleTone; label: string; icon: any }[] = [
+    { id: 'silver', label: t.speckles.toneSilver, icon: Sparkles },
+    { id: 'dark', label: t.speckles.toneDark, icon: Flame },
+    { id: 'mixed', label: t.speckles.toneMixed, icon: Layers },
+  ];
+
   return (
     <div className="space-y-4">
       {/* Speckle Tone (Silver Sparkles vs Dark Charcoal vs Mixed) */}
       <div className="space-y-1.5">
         <label className="text-[11px] font-medium text-studio-400 uppercase tracking-wider flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-accent" />
-          <span>Tono de Motas y Puntos</span>
+          <span>{t.speckles.tone}</span>
         </label>
         <div className="grid grid-cols-3 gap-1.5 p-1 bg-studio-950/80 rounded-lg border border-studio-800">
-          {TONES.map((t) => {
-            const Icon = t.icon;
-            const isSelected = config.speckleTone === t.id;
+          {tones.map((tone) => {
+            const Icon = tone.icon;
+            const isSelected = config.speckleTone === tone.id;
             return (
               <button
-                key={t.id}
+                key={tone.id}
                 onClick={() => {
-                  // When switching to silver, recommend blendMode screen for intense pop
-                  if (t.id === 'silver') {
+                  if (tone.id === 'silver') {
                     updateConfig({ speckleTone: 'silver', blendMode: 'screen', grainOpacity: Math.max(75, config.grainOpacity) });
-                  } else if (t.id === 'dark') {
+                  } else if (tone.id === 'dark') {
                     updateConfig({ speckleTone: 'dark', blendMode: 'overlay' });
                   } else {
                     updateConfig({ speckleTone: 'mixed', blendMode: 'overlay' });
@@ -46,19 +48,19 @@ export const SpeckleControls: React.FC<SpeckleControlsProps> = ({ config, update
                 }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-accent' : 'text-studio-400'}`} />
-                <span className="text-[11px] font-semibold">{t.label}</span>
+                <span className="text-[10px] font-semibold truncate max-w-full">{tone.label}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Speckle Sharpness (Agudeza de puntos / thresholding) */}
+      {/* Speckle Sharpness (Stippling sharpness / thresholding) */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs">
           <span className="text-studio-300 font-medium flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-accent" />
-            <span>Agudeza de Puntos (Stippling)</span>
+            <span>{t.speckles.sharpness}</span>
           </span>
           <span className="text-accent font-mono font-semibold">{config.speckleSharpness}</span>
         </div>
@@ -71,18 +73,14 @@ export const SpeckleControls: React.FC<SpeckleControlsProps> = ({ config, update
           onChange={(e) => updateConfig({ speckleSharpness: parseInt(e.target.value) })}
           className="w-full h-1.5 bg-studio-800 rounded-lg appearance-none cursor-pointer accent-accent"
         />
-        <div className="flex justify-between text-[10px] text-studio-500 font-mono">
-          <span>Difuminado</span>
-          <span>Motas Nítidas (Kilowatty)</span>
-        </div>
       </div>
 
-      {/* Speckle Density (Cantidad de puntos) */}
+      {/* Speckle Density (Dot amount) */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs">
           <span className="text-studio-300 font-medium flex items-center gap-1.5">
             <Dot className="w-4 h-4 text-accent" />
-            <span>Cantidad de Puntos / Densidad</span>
+            <span>{t.speckles.density}</span>
           </span>
           <span className="text-studio-400 font-mono">{config.speckleDensity}%</span>
         </div>
@@ -95,10 +93,6 @@ export const SpeckleControls: React.FC<SpeckleControlsProps> = ({ config, update
           onChange={(e) => updateConfig({ speckleDensity: parseInt(e.target.value) })}
           className="w-full h-1.5 bg-studio-800 rounded-lg appearance-none cursor-pointer accent-accent"
         />
-        <div className="flex justify-between text-[10px] text-studio-500 font-mono">
-          <span>Esparcido</span>
-          <span>Denso / Asfalto</span>
-        </div>
       </div>
 
       {/* Speckle Contrast */}
@@ -106,7 +100,7 @@ export const SpeckleControls: React.FC<SpeckleControlsProps> = ({ config, update
         <div className="flex justify-between text-xs">
           <span className="text-studio-300 font-medium flex items-center gap-1.5">
             <Contrast className="w-3.5 h-3.5 text-studio-400" />
-            <span>Contraste & Intensidad</span>
+            <span>{t.speckles.contrast}</span>
           </span>
           <span className="text-studio-400 font-mono">{config.speckleContrast.toFixed(1)}x</span>
         </div>
@@ -126,7 +120,7 @@ export const SpeckleControls: React.FC<SpeckleControlsProps> = ({ config, update
         <div className="flex justify-between text-xs">
           <span className="text-studio-300 font-medium flex items-center gap-1.5">
             <ZoomIn className="w-3.5 h-3.5 text-studio-400" />
-            <span>Escala del Grano</span>
+            <span>{t.blend.scale}</span>
           </span>
           <span className="text-studio-400 font-mono">{config.grainScale.toFixed(2)}x</span>
         </div>
@@ -146,7 +140,7 @@ export const SpeckleControls: React.FC<SpeckleControlsProps> = ({ config, update
         <div className="flex justify-between text-xs">
           <span className="text-studio-300 font-medium flex items-center gap-1.5">
             <SunMedium className="w-3.5 h-3.5 text-studio-400" />
-            <span>Compensación de Brillo</span>
+            <span>{t.speckles.brightness}</span>
           </span>
           <span className="text-studio-400 font-mono">{(config.speckleBrightness * 100).toFixed(0)}%</span>
         </div>
