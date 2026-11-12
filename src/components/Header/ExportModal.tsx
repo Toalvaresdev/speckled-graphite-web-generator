@@ -5,6 +5,7 @@ import { GraphiteConfig, AspectRatio } from '../../types/graphite';
 import { generateCssSnippet, generateTailwindSnippet, generateReactJsxSnippet } from '../../utils/cssGenerator';
 import { generateFullSvg } from '../../utils/svgGenerator';
 import { exportToCanvas } from '../../utils/canvasExporter';
+import { recordDownload } from '../../utils/supabase';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 interface ExportModalProps {
@@ -74,6 +75,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
         // Also increment local count for in-app tracking
         const currentCount = parseInt(localStorage.getItem('speckled_downloads_count') || '0', 10);
         localStorage.setItem('speckled_downloads_count', String(currentCount + 1));
+
+        // Record in Supabase
+        recordDownload({
+          format: imgFormat,
+          resolution: `${finalWidth}x${finalHeight}`,
+          ratio: selectedRatio,
+          tone: config.speckleTone,
+          seed: config.seed,
+        });
       } catch (err) {
         // Analytics non-blocking
       }
@@ -105,6 +115,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
       });
       const currentCopies = parseInt(localStorage.getItem('speckled_copies_count') || '0', 10);
       localStorage.setItem('speckled_copies_count', String(currentCopies + 1));
+
+      // Record in Supabase
+      recordDownload({
+        format: `${codeType}_copy`,
+        tone: config.speckleTone,
+      });
     } catch (err) {
       // Non-blocking
     }
@@ -118,6 +134,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, confi
       });
       const currentCount = parseInt(localStorage.getItem('speckled_downloads_count') || '0', 10);
       localStorage.setItem('speckled_downloads_count', String(currentCount + 1));
+
+      // Record in Supabase
+      recordDownload({
+        format: 'svg',
+        resolution: `${finalWidth}x${finalHeight}`,
+        tone: config.speckleTone,
+        seed: config.seed,
+      });
     } catch (err) {
       // Non-blocking
     }

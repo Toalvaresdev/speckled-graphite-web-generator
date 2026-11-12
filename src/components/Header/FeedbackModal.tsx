@@ -9,9 +9,11 @@ import {
   Bug, 
   ThumbsUp, 
   ExternalLink,
-  Heart
+  Heart,
+  Cloud
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { fetchFeedback, insertFeedback, upvoteFeedback } from '../../utils/supabase';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -41,9 +43,34 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
   const [commentText, setCommentText] = useState('');
   const [sentiment, setSentiment] = useState('😍');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Load ONLY real user comments from localStorage (no mock/invented data)
-  useEffect(() => {
+  // Load comments from Supabase with fallback to localStorage
+  const loadComments = async () => {
+    setIsLoading(true);
+    try {
+      const remote = await fetchFeedback();
+      if (remote && remote.length > 0) {
+        const mapped: FeedbackItem[] = remote.map((r) => ({
+          id: r.id,
+          author: r.author,
+          location: r.location || 'Global Visitor',
+          category: r.category,
+          comment: r.comment,
+          sentiment: r.sentiment,
+          timestamp: new Date(r.created_at).toLocaleDateString(),
+          upvotes: r.upvotes || 1,
+        }));
+        setComments(mapped);
+        localStorage.setItem('speckled_graphite_feedback', JSON.stringify(mapped));
+        setIsLoading(false);
+        return;
+      }
+    } catch {
+      // Fallback below
+    }
+
+    // Fallback to local
     try {
       const stored = localStorage.getItem('speckled_graphite_feedback');
       if (stored) {
@@ -51,22 +78,34 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
         if (Array.isArray(parsed)) {
           setComments(parsed);
         }
+      } else {
+        setComments([]);
       }
     } catch {
       setComments([]);
     }
-  }, []);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadComments();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
 
+    const authorName = author.trim() || (language === 'es' ? 'Diseñador Anónimo' : 'Anonymous Designer');
+    const locationStr = language === 'es' ? 'Visitante Web' : 'Web Visitor';
+
     const newFeedback: FeedbackItem = {
       id: String(Date.now()),
-      author: author.trim() || (language === 'es' ? 'Diseñador Anónimo' : 'Anonymous Designer'),
-      location: language === 'es' ? 'Visitante Web' : 'Web Visitor',
+      author: authorName,
+      location: locationStr,
       category,
       comment: commentText.trim(),
       sentiment,
@@ -74,15 +113,36 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
       upvotes: 1,
     };
 
+    // Save locally immediately
     const updated = [newFeedback, ...comments];
+    setComments(updated);
     try {
       localStorage.setItem('speckled_graphite_feedback', JSON.stringify(updated));
     } catch (err) {
       console.error(err);
     }
 
-    setComments(updated);
     setIsSubmitted(true);
+
+    // Save to Supabase in background
+    try {
+      const inserted = await insertFeedback({
+        author: authorName,
+        location: locationStr,
+        category,
+        comment: commentText.trim(),
+        sentiment,
+      });
+      if (inserted) {
+        newFeedback.id = inserted.id;
+        const refreshed = [newFeedback, ...comments.filter(c => c.id !== newFeedback.id)];
+        setComments(refreshed);
+        localStorage.setItem('speckled_graphite_feedback', JSON.stringify(refreshed));
+      }
+    } catch (err) {
+      console.warn('Supabase insert non-blocking error:', err);
+    }
+
     setTimeout(() => {
       setIsSubmitted(false);
       setCommentText('');
@@ -104,7 +164,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
     );
   };
 
-  const handleUpvote = (id: string) => {
+  const handleUpvote = async (id: string) => {
+    const current = comments.find((c) => c.id === id);
+    const currentCount = current?.upvotes || 1;
+
     const updated = comments.map((c) => (c.id === id ? { ...c, upvotes: c.upvotes + 1 } : c));
     setComments(updated);
     try {
@@ -112,6 +175,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
     } catch (err) {
       console.error(err);
     }
+
+    // Update in Supabase
+    upvoteFeedback(id, currentCount);
   };
 
   return (
@@ -132,8 +198,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
             <div>
               <h2 className="text-sm font-bold text-white flex items-center gap-2">
                 <span>{t.feedbackModal.title}</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-studio-800 text-studio-400 border border-studio-700/60">
-                  {t.feedbackModal.globalBadge}
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 flex items-center gap-1">
+                  <Cloud className="w-2.5 h-2.5 text-emerald-400" />
+                  <span>Cloud Live</span>
                 </span>
               </h2>
               <p className="text-xs text-studio-400">
@@ -323,7 +390,12 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
             </form>
           ) : (
             <div className="space-y-3">
-              {comments.length === 0 ? (
+              {isLoading ? (
+                <div className="py-12 flex flex-col items-center justify-center text-center">
+                  <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin mb-3" />
+                  <span className="text-xs text-studio-400 font-mono">Sincronizando con Supabase...</span>
+                </div>
+              ) : comments.length === 0 ? (
                 /* Pure Real Empty State */
                 <div className="py-12 flex flex-col items-center justify-center text-center px-4">
                   <div className="w-12 h-12 rounded-2xl bg-studio-800/60 border border-studio-700 flex items-center justify-center mb-3 text-studio-400">
